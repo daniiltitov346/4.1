@@ -1,0 +1,81 @@
+#include <iostream>
+#include "vector.h"
+#include <set>        // для хранения уникальных отсортированных чисел
+#include <cstdlib>    // для rand()
+#include <ctime>      // для time()
+#include <limits>     // для numeric_limits
+
+void process_sequence() {
+    const int MAX_VALUE = 10000000;
+    char choice;
+    long long n;
+
+    std::cout << "Choose method ('u' - user input, 'r' - random): ";
+    std::cin >> choice;
+
+    std::cout << "Enter count of numbers: ";
+    std::cin >> n;
+
+    if (n <= 0) {
+        std::cout << "Invalid count!" << std::endl;
+        return;
+    }
+
+    std::set<int> unique_numbers;
+
+    if (choice == 'u') {
+        
+        std::cout << "Enter numbers (0 to " << MAX_VALUE << "):" << std::endl;
+        for (long long i = 0; i < n; ++i) {
+            int num;
+            if (std::cin >> num) {
+                if (num >= 0 && num <= MAX_VALUE) {
+                    unique_numbers.insert(num);
+                }
+                else {
+                    std::cout << "Number out of range! Skipped." << std::endl;
+                }
+            }
+            else {
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                std::cout << "Invalid input! Skipped." << std::endl;
+            }
+        }
+    }
+    else if (choice == 'r') {
+        // Генерация случайных чисел
+        std::srand(std::time(nullptr));
+        for (long long i = 0; i < n; ++i) {
+            int num = std::rand() % (MAX_VALUE + 1);
+            unique_numbers.insert(num);
+        }
+    }
+    else {
+        std::cout << "Invalid choice!" << std::endl;
+        return;
+    }
+
+    // Вывод результатов (уже отсортированных)
+    std::cout << "Unique numbers in ascending order: ";
+    if (unique_numbers.empty()) {
+        std::cout << "No numbers were added.";
+    }
+    else {
+        for (int num : unique_numbers) {
+            std::cout << num << " ";
+        }
+    }
+    std::cout << std::endl;
+}
+
+int main() {
+    Vector v1(10);      
+    Vector v2(v1);      
+    Vector v3 = v1;   
+
+    Vector v1(10), v2(20);
+    v2 = v1;  
+    process_sequence();
+    return 0;
+}
