@@ -1,1 +1,125 @@
+#include "vector.h"
+#include <iostream>
+#include <stdexcept>
+#include <cstdlib>
+#include <ctime>
+
+Vector::Vector() : 
+    capacity_(10), 
+    size_(0),
+    data_(new int[capacity_]()) {}
+
+Vector::Vector(size_t size) : 
+    capacity_(size),
+    size_(size),
+    data_(new int[capacity_]()) {}
+
+Vector::Vector(size_t size, int value) :
+    capacity_(size),
+    size_(size),
+    data_(new int[capacity_]) {
+    for (size_t i = 0; i < size_; ++i) {
+        data_[i] = value;
+    }
+}
+//конструктор копирования
+Vector::Vector(const Vector& other) : capacity_(other.capacity_), size_(other.size_), data_(new int[capacity_]) {
+    for (size_t i = 0; i < size_; ++i) {
+        data_[i] = other.data_[i];
+    }
+}
+
+//конструктор перемещения
+Vector::Vector(Vector&& other) noexcept : capacity_(other.capacity_), size_(other.size_), data_(other.data_) {
+    other.capacity_ = 0;
+    other.size_ = 0;
+    other.data_ = nullptr;
+}
+
+// Оператор присваивания копированием
+Vector& Vector::operator=(const Vector& other) {
+    if (this != &other) {
+        delete[] data_;
+        capacity_ = other.capacity_;
+        size_ = other.size_;
+        data_ = new int[capacity_];
+        for (size_t i = 0; i < size_; ++i) {
+            data_[i] = other.data_[i];
+        }
+    }
+    return *this;
+}
+// Оператор присваивания перемещением
+Vector& Vector::operator=(Vector&& other) noexcept {
+    if (this != &other) {
+        delete[] data_;
+        capacity_ = other.capacity_;
+        size_ = other.size_;
+        data_ = other.data_;
+        other.capacity_ = 0;
+        other.size_ = 0;
+        other.data_ = nullptr;
+    }
+    return *this;
+}
+
+Vector::~Vector() {
+    delete[] data_;
+}
+
+void Vector::resize_internal(size_t new_capacity) {
+    int* new_data = new int[new_capacity]();
+    for (size_t i = 0; i < size_; ++i) {
+        new_data[i] = data_[i];
+    }
+    delete[] data_;
+    data_ = new_data;
+    capacity_ = new_capacity;
+}
+
+void Vector::resize(size_t new_size) {
+    if (new_size > capacity_) {
+        resize_internal(new_size * 2);
+    }
+    size_ = new_size;
+}
+
+size_t Vector::size() const {
+    return size_;
+}
+
+void Vector::fill_random(int min_val, int max_val) {
+    if (min_val > max_val) std::swap(min_val, max_val);
+    std::srand(std::time(nullptr));
+    for (size_t i = 0; i < size_; ++i) {
+        data_[i] = min_val + std::rand() % (max_val - min_val + 1);
+    }
+}
+
+int& Vector::operator[](size_t index) {
+    if (index >= size_) {
+        throw std::out_of_range("Index out of range");
+    }
+    return data_[index];
+}
+
+const int& Vector::operator[](size_t index) const {
+    if (index >= size_) {
+        throw std::out_of_range("Index out of range");
+    }
+    return data_[index];
+}
+
+std::ostream& operator<<(std::ostream& os, const Vector& vec) {
+    for (size_t i = 0; i < vec.size_; ++i) {
+        os << vec.data_[i] << " ";
+    }
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, Vector& vec) {
+    for (size_t i = 0; i < vec.size_; ++i) {
+        is >> vec.data_[i];
+    }
+    return is;
 
