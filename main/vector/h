@@ -1,0 +1,36 @@
+#include <iostream>
+#include <stdexcept>
+
+class Vector {
+private:
+    size_t capacity_;
+    size_t size_;
+    int* data_;
+
+    void resize_internal(size_t new_capacity);
+
+public:
+    // Конструкторы
+    Vector();
+    explicit Vector(size_t size);
+    Vector(size_t size, int value);
+
+    // Правило пяти
+    Vector(const Vector& other);  //копирование
+    Vector(Vector&& other) noexcept; //перемещение
+    Vector& operator=(const Vector& other); //присваивание копированием
+    Vector& operator=(Vector&& other) noexcept; //присваивание перемещением
+    ~Vector();
+
+    // Методы
+    void resize(size_t new_size);
+    size_t size() const;
+    void fill_random(int min_val, int max_val);
+
+    // Операторы
+    int& operator[](size_t index);
+    const int& operator[](size_t index) const;
+
+    friend std::ostream& operator<<(std::ostream& os, const Vector& vec);
+    friend std::istream& operator>>(std::istream& is, Vector& vec);
+};
