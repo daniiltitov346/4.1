@@ -1,9 +1,30 @@
 #include <iostream>
 #include "vector.h"
-#include <set>        // для хранения уникальных отсортированных чисел
-#include <cstdlib>    // для rand()
-#include <ctime>      // для time()
-#include <limits>     // для numeric_limits
+#include <cstdlib>    
+#include <ctime>      
+#include <limits>     
+
+
+bool contains(const Vector& vec, int value) {
+    for (size_t i = 0; i < vec.size(); ++i) {
+        if (vec[i] == value) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void sort_vector(Vector& vec) {
+    for (size_t i = 0; i < vec.size() - 1; ++i) {
+        for (size_t j = 0; j < vec.size() - i - 1; ++j) {
+            if (vec[j] > vec[j + 1]) {
+                int temp = vec[j];
+                vec[j] = vec[j + 1];
+                vec[j + 1] = temp;
+            }
+        }
+    }
+}
 
 void process_sequence() {
     const int MAX_VALUE = 10000000;
@@ -21,16 +42,19 @@ void process_sequence() {
         return;
     }
 
-    std::set<int> unique_numbers;
+    Vector numbers;
+    numbers.resize(0); 
 
     if (choice == 'u') {
-        
         std::cout << "Enter numbers (0 to " << MAX_VALUE << "):" << std::endl;
         for (long long i = 0; i < n; ++i) {
             int num;
             if (std::cin >> num) {
                 if (num >= 0 && num <= MAX_VALUE) {
-                    unique_numbers.insert(num);
+                    if (!contains(numbers, num)) {
+                        numbers.resize(numbers.size() + 1);
+                        numbers[numbers.size() - 1] = num;
+                    }
                 }
                 else {
                     std::cout << "Number out of range! Skipped." << std::endl;
@@ -44,11 +68,13 @@ void process_sequence() {
         }
     }
     else if (choice == 'r') {
-        // Генерация случайных чисел
         std::srand(std::time(nullptr));
         for (long long i = 0; i < n; ++i) {
             int num = std::rand() % (MAX_VALUE + 1);
-            unique_numbers.insert(num);
+            if (!contains(numbers, num)) {
+                numbers.resize(numbers.size() + 1);
+                numbers[numbers.size() - 1] = num;
+            }
         }
     }
     else {
@@ -56,26 +82,21 @@ void process_sequence() {
         return;
     }
 
-    // Вывод результатов (уже отсортированных)
+    sort_vector(numbers);
+
     std::cout << "Unique numbers in ascending order: ";
-    if (unique_numbers.empty()) {
+    if (numbers.size() == 0) {
         std::cout << "No numbers were added.";
     }
     else {
-        for (int num : unique_numbers) {
-            std::cout << num << " ";
+        for (size_t i = 0; i < numbers.size(); ++i) {
+            std::cout << numbers[i] << " ";
         }
     }
     std::cout << std::endl;
 }
 
 int main() {
-    Vector v1(10);      
-    Vector v2(v1);      
-    Vector v3 = v1;   
-
-    Vector v1(10), v2(20);
-    v2 = v1;  
     process_sequence();
     return 0;
 }
